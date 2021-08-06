@@ -2,6 +2,7 @@ package v1
 
 import (
 	setting "gin-blog/pkg/settting"
+	"github.com/astaxie/beego/validation"
 	"github.com/unknwon/com"
 	"net/http"
 
@@ -13,7 +14,7 @@ import (
 	"gin-blog/pkg/util"
 )
 
-//获取多个文章标签
+// GetTags 获取多个文章标签
 func GetTags(c *gin.Context) {
 	name := c.Query("name")
 
@@ -42,14 +43,39 @@ func GetTags(c *gin.Context) {
 	})
 }
 
-//新增文章标签
+// AddTag 新增文章标签
 func AddTag(c *gin.Context) {
+	name := c.PostForm("name")
+	state := com.StrTo(c.DefaultPostForm("state", "0")).MustInt()
+	createdBy := "admin"
+
+	//参数验证
+	valid := validation.Validation{}
+	valid.Required(name, "name").Message("name不能为空")
+	valid.MaxSize(name, 100, "name").Message("name最大长度为100字符")
+	valid.Range(state, 0, 1, "state").Message("状态只有0或1")
+	code := e.SUCCESS
+	if !valid.HasErrors() {
+		if !models.ExistTagByName(name) {
+			models.AddTag(name, state, createdBy)
+		} else {
+			code = e.ERROR_EXIST_TAG
+		}
+	} else {
+		code = 1000
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"code":code,
+		"message":e.GetMsg(code),
+		"data": make(map[string]string),
+	})
 }
 
-//修改文章标签
+// EditTag 修改文章标签
 func EditTag(c *gin.Context) {
 }
 
-//删除文章标签
+// DeleteTag 删除文章标签
 func DeleteTag(c *gin.Context) {
 }
