@@ -8,8 +8,11 @@ import (
 )
 
 type Article struct {
-	ID         int
+	Model
+
 	TagID      int    `json:"tag_id" gorm:"index"`
+	Tag	       Tag    `json:"tag"`
+	
 	Title      string `json:"title"`
 	Desc       string `json:"desc"`
 	Content    string `json:"content"`

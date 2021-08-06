@@ -62,7 +62,7 @@ func AddTag(c *gin.Context) {
 			code = e.ERROR_EXIST_TAG
 		}
 	} else {
-		code = 1000
+		code = e.INVALID_PARAMS
 	}
 
 	c.JSON(http.StatusOK, gin.H{
@@ -74,8 +74,45 @@ func AddTag(c *gin.Context) {
 
 // EditTag 修改文章标签
 func EditTag(c *gin.Context) {
+	id := com.StrTo(c.Param("id")).MustInt()
+	name := c.PostForm("name")
+	modifiedBy := "admin"
+
+	//参数验证
+	valid := validation.Validation{}
+	valid.Required(name, "name").Message("name不能为空")
+	valid.MaxSize(name, 100, "name").Message("name最大长度为100字符")
+
+	code := e.SUCCESS
+	if !valid.HasErrors() {
+		if !models.ExistTagByName(name) {
+			data := make(map[string]interface{})
+			data["name"] = name
+			data["modified_by"] = modifiedBy
+			models.EditTag(id, data)
+		} else {
+			code = e.ERROR_EXIST_TAG
+		}
+	} else {
+		code = e.INVALID_PARAMS
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"code":code,
+		"message":e.GetMsg(code),
+		"data":make(map[string]string),
+	})
 }
 
 // DeleteTag 删除文章标签
 func DeleteTag(c *gin.Context) {
+	id := com.StrTo(c.Param("id")).MustInt()
+
+	models.DeleteTag(id)
+	code := e.SUCCESS
+	c.JSON(http.StatusOK, gin.H{
+		"code":code,
+		"message":e.GetMsg(code),
+		"data":make(map[string]string),
+	})
 }

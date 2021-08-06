@@ -38,5 +38,16 @@ func AddTag(name string, state int, createdBy string) bool {
 	})
 
 	return true
+}
 
+func DeleteTag(id int) bool {
+	db.Where("id=?", id).Delete(&Tag{})
+
+	return true
+}
+
+func EditTag(id int, data interface{}) bool {
+	db.Model(&Tag{}).Where("id=?", id).Update(data)
+
+	return true
 }
