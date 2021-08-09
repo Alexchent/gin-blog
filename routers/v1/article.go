@@ -100,7 +100,35 @@ func AddArticle(c *gin.Context) {
 
 // EditArticle 修改文章
 func EditArticle(c *gin.Context)  {
+	id := com.StrTo(c.Param("id")).MustInt()
+	tagId := com.StrTo(c.PostForm("tag_id")).MustInt()
+	title := c.PostForm("title")
+	desc := c.PostForm("desc")
+	content := c.PostForm("content")
+	state := com.StrTo(c.PostForm("state")).MustInt()
 
+	code := e.INVALID_PARAMS
+	if models.ExistArticleByID(id) {
+		if models.ExistTagById(tagId) {
+			data := make(map[string]interface{})
+			data["tag_id"] = tagId
+			data["title"] = title
+			data["desc"] = desc
+			data["content"] = content
+			data["state"] = state
+			models.EditArticle(id, data)
+			code = e.SUCCESS
+		} else {
+			code = e.ERROR_NOT_EXIST_TAG
+		}
+	} else {
+		code = e.ERROR_NOT_EXIST_ARTICLE
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"code" : code,
+		"msg" : e.GetMsg(code),
+		"data" : make(map[string]string),
+	})
 }
 
 // DeleteArticle 删除文章
