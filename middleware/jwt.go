@@ -1,4 +1,4 @@
-package middleware
+package jwt
 
 import (
 	"gin-blog/pkg/e"
