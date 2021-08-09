@@ -27,7 +27,7 @@ func GetArticle(c *gin.Context)  {
 	})
 }
 
-//获取多个文章
+// GetArticles 获取多个文章
 func GetArticles(c *gin.Context)  {
 	title := c.Query("title")
 	tagId := com.StrTo(c.DefaultQuery("tagId", "-1")).MustInt()
@@ -60,16 +60,30 @@ func GetArticles(c *gin.Context)  {
 		"data" : data,
 	})
 }
-//新建文章
+
+// AddArticle 新建文章
 func AddArticle(c *gin.Context) {
 
 }
-//修改文章
+
+// EditArticle 修改文章
 func EditArticle(c *gin.Context)  {
 
 }
 
-//删除文章
+// DeleteArticle 删除文章
 func DeleteArticle(c *gin.Context) {
+	id := com.StrTo(c.Param("id")).MustInt()
 
+	code := e.ERROR_NOT_EXIST_ARTICLE
+	if models.ExistArticleByID(id) {
+		models.DeleteArticle(id)
+		code = e.SUCCESS
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"code" : code,
+		"msg" : e.GetMsg(code),
+		"data" : make(map[string]string),
+	})
 }
