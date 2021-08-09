@@ -1,6 +1,7 @@
 package models
 
 import (
+	"fmt"
 	"github.com/jinzhu/gorm"
 	_ "golang.org/x/text/number"
 	"time"
@@ -44,6 +45,7 @@ func GetArticles(pageNum int, pageSize int, maps interface{}) (articles []Articl
 
 func GetArticle(id int) (article Article)  {
 	//db.Where("id=?", id).First(&article)
+	fmt.Println(id)
 	db.First(&article, id)
 	db.Model(&article).Related(&article.Tag)
 	return

@@ -1,10 +1,13 @@
 package v1
 
 import (
+	"fmt"
 	"gin-blog/models"
 	"gin-blog/pkg/e"
+	"gin-blog/pkg/logging"
 	setting "gin-blog/pkg/settting"
 	"gin-blog/pkg/util"
+	"github.com/astaxie/beego/validation"
 	"github.com/gin-gonic/gin"
 	"github.com/unknwon/com"
 	"net/http"
@@ -68,15 +71,15 @@ func AddArticle(c *gin.Context) {
 	desc := c.PostForm("desc")
 	content := c.PostForm("content")
 
-	//valid := validation.Validation{}
-	//valid.Min(tagId, 1, "tag_id").Message("标签ID必须大于0")
-	//valid.Required(title, "title").Message("标题不能为空")
-	//valid.Required(desc, "desc").Message("简述不能为空")
-	//valid.Required(content, "content").Message("内容不能为空")
+	valid := validation.Validation{}
+	valid.Min(tagId, 1, "tag_id").Message("标签ID必须大于0")
+	valid.Required(title, "title").Message("标题不能为空")
+	valid.Required(desc, "desc").Message("简述不能为空")
+	valid.Required(content, "content").Message("内容不能为空")
 
 	code := e.INVALID_PARAMS
 
-	//if !valid.HasErrors() {
+	if !valid.HasErrors() {
 		if models.ExistTagById(tagId) {
 			data := make(map[string]interface{})
 			data["tag_id"] = tagId
@@ -90,7 +93,13 @@ func AddArticle(c *gin.Context) {
 		} else {
 			code = e.ERROR_NOT_EXIST_TAG
 		}
-	//}
+	} else {
+		for _, err := range valid.Errors {
+			fmt.Println(err.Message)
+			logging.Info(err.Key, err.Message)
+		}
+	}
+
 	c.JSON(http.StatusOK, gin.H{
 		"code" : code,
 		"msg" : e.GetMsg(code),
