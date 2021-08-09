@@ -63,7 +63,39 @@ func GetArticles(c *gin.Context)  {
 
 // AddArticle 新建文章
 func AddArticle(c *gin.Context) {
+	tagId := com.StrTo(c.PostForm("tag_id")).MustInt()
+	title := c.PostForm("title")
+	desc := c.PostForm("desc")
+	content := c.PostForm("content")
 
+	//valid := validation.Validation{}
+	//valid.Min(tagId, 1, "tag_id").Message("标签ID必须大于0")
+	//valid.Required(title, "title").Message("标题不能为空")
+	//valid.Required(desc, "desc").Message("简述不能为空")
+	//valid.Required(content, "content").Message("内容不能为空")
+
+	code := e.INVALID_PARAMS
+
+	//if !valid.HasErrors() {
+		if models.ExistTagById(tagId) {
+			data := make(map[string]interface{})
+			data["tag_id"] = tagId
+			data["title"] = title
+			data["desc"] = desc
+			data["content"] = content
+			data["created_by"] = "createdBy"
+			data["state"] = 0
+			models.AddArticle(data)
+			code = e.SUCCESS
+		} else {
+			code = e.ERROR_NOT_EXIST_TAG
+		}
+	//}
+	c.JSON(http.StatusOK, gin.H{
+		"code" : code,
+		"msg" : e.GetMsg(code),
+		"data" : make(map[string]interface{}),
+	})
 }
 
 // EditArticle 修改文章
