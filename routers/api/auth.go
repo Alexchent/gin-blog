@@ -8,15 +8,25 @@ import (
 	"net/http"
 )
 
+type Auth struct {
+	Username string `json:"username" binding:"required"`
+	Password string `json:"password" binding:"required"`
+}
 func GetAuth(c *gin.Context) {
-	username := c.Query("username")
-	password := c.Query("password")
+	var auth Auth
+	if err := c.ShouldBindJSON(&auth); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	//log.Println(auth)
+	//username := c.Query("username")
+	//password := c.Query("password")
 
 	data := make(map[string]interface{})
 	code := e.SUCCESS
 
-	if models.CheckAuth(username, password) {
-		token, err := util.GenerateToken(username,password)
+	if models.CheckAuth(auth.Username, auth.Password) {
+		token, err := util.GenerateToken(auth.Username,auth.Password)
 		if err != nil {
 			code = e.ERROR_AUTH_TOKEN
 		} else {
