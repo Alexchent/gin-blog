@@ -1,7 +1,6 @@
 package models
 
 import (
-	"fmt"
 	"github.com/jinzhu/gorm"
 	_ "golang.org/x/text/number"
 	"time"
@@ -23,8 +22,8 @@ type Article struct {
 
 func ExistArticleByID(id int) bool {
 	var article Article
-	fmt.Println(id)
 	db.First(&article, id)
+	//db.Where("id=?", id).First(&article)
 	if article.ID > 0 {
 		return true
 	}
@@ -44,9 +43,9 @@ func GetArticles(pageNum int, pageSize int, maps interface{}) (articles []Articl
 }
 
 func GetArticle(id int) (article Article)  {
-	db.Where("id=?", id).First(&article)
-	//db.Model(&article).Related(&article.Tag)
-
+	//db.Where("id=?", id).First(&article)
+	db.First(&article, id)
+	db.Model(&article).Related(&article.Tag)
 	return
 }
 
