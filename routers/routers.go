@@ -52,5 +52,15 @@ func InitRouter() *gin.Engine {
 		c.AsciiJSON(http.StatusOK, data)
 	})
 
+
+	// HTML渲染 https://www.kancloud.cn/oldlei/go-gin/1333093
+	r.LoadHTMLGlob("templates/*")
+	//router.LoadHTMLFiles("templates/template1.html", "templates/template2.html")
+	r.GET("/index", func(c *gin.Context) {
+		c.HTML(http.StatusOK, "index.html", gin.H{
+			"title": "Main website",
+		})
+	})
+
 	return r
 }
