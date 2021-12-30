@@ -6,6 +6,7 @@ import (
 	"gin-blog/routers/api"
 	v1 "gin-blog/routers/v1"
 	"github.com/gin-gonic/gin"
+	"net/http"
 )
 
 func InitRouter() *gin.Engine {
@@ -31,7 +32,6 @@ func InitRouter() *gin.Engine {
 		//删除指定标签
 		apiv1.DELETE("/tags/:id", v1.DeleteTag)
 
-
 		apiv1.GET("/articles/:id", v1.GetArticle)
 		apiv1.GET("/articles", v1.GetArticles)
 		//新建标签
@@ -41,6 +41,16 @@ func InitRouter() *gin.Engine {
 		//删除指定标签
 		apiv1.DELETE("/articles/:id", v1.DeleteArticle)
 	}
+
+	//使用 AsciiJSON 生成具有转义的非 ASCII 字符的 ASCII-only JSON。
+	r.GET("/someJSON", func(c *gin.Context) {
+		data := map[string]interface{}{
+			"lang": "GO语言",
+			"tag":  "<br>",
+		}
+		// will output : {"lang":"GO\u8bed\u8a00","tag":"\u003cbr\u003e"}
+		c.AsciiJSON(http.StatusOK, data)
+	})
 
 	return r
 }
